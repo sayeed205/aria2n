@@ -1,9 +1,11 @@
-import {
-    Client,
-    HTTPTransport,
-    RequestManager,
-    WebSocketTransport,
-} from '@open-rpc/client-js';
+// import {
+//     Client,
+//     HTTPTransport,
+//     RequestManager,
+//     WebSocketTransport,
+// } from '@open-rpc/client-js';
+import Client from './JSONRPC';
+// import { EventEmitter } from "events";
 
 import { Aria2Version, Aria2nOptions, Key, Status, onProgress } from '../types';
 
@@ -12,19 +14,18 @@ export class Aria2n {
 
     constructor(
         private readonly options: Aria2nOptions = {
-            /**
-             * use websocket or not
-             * @default true
-             */
-            ws: true,
             host: 'localhost',
             port: 6800,
+            path: '/jsonrpc',
             secure: false,
             secret: '',
         }
     ) {
         this.options = options;
-        this.initiateRPCClient();
+        this.client = new Client(
+            `http://${this.options.host}:${this.options.port}/jsonrpc`,
+            this.options.secret!
+        );
     }
 
     async getDownloads(gids: string[] = [], keys: Key[] = []) {
@@ -73,71 +74,51 @@ export class Aria2n {
     }
 
     async getStatus(gid: string, keys: Key[] = []) {
-        const Status = (await this.client?.request({
-            method: 'aria2.tellStatus',
-            params: [gid, keys],
-        })) as Partial<Status>;
+        const Status = (await this.client?.request('aria2.tellStatus', [
+            gid,
+            keys,
+        ])) as Partial<Status>;
         return Status;
     }
 
     async getActive(keys: Key[] = []) {
-        const active = (await this.client?.request({
-            method: 'aria2.tellActive',
-            params: [keys],
-        })) as Partial<Status>[];
+        const active = (await this.client?.request('aria2.tellActive', [
+            keys,
+        ])) as Partial<Status>[];
 
         return active;
     }
 
     async getWaiting(offset: number, limit: number, keys: Key[] = []) {
-        const waiting = (await this.client?.request({
-            method: 'aria2.tellWaiting',
-            params: [offset, limit, keys],
-        })) as Partial<Status>[];
+        const waiting = (await this.client?.request('aria2.tellWaiting', [
+            offset,
+            limit,
+            keys,
+        ])) as Partial<Status>[];
         return waiting;
     }
 
     async getStopped(offset: number, limit: number, keys: Key[] = []) {
-        const stopped = (await this.client?.request({
-            method: 'aria2.tellStopped',
-            params: [offset, limit, keys],
-        })) as Partial<Status>[];
+        const stopped = (await this.client?.request('aria2.tellStopped', [
+            offset,
+            limit,
+            keys,
+        ])) as Partial<Status>[];
         return stopped;
     }
 
     async getVersion() {
-        const version = (await this.client?.request({
-            method: 'aria2.getVersion',
-            params: [],
-        })) as Aria2Version;
+        const version = (await this.client?.request(
+            'aria2.getVersion',
+            []
+        )) as Aria2Version;
         return version;
     }
 
-    private get isWS() {
-        return this.options.ws;
-    }
-
-    private initiateRPCClient() {
-        if (this.isWS) {
-            this.initiateWSClient();
-        } else {
-            this.initiateHTTPClient();
-        }
-    }
-
-    private initiateWSClient() {
-        const transport = new HTTPTransport(
-            `http://${this.options.host}:${this.options.port}/jsonrpc`
-        );
-        const client = new Client(new RequestManager([transport]));
-        this.client = client;
-    }
-
-    private initiateHTTPClient() {
-        const transport = new WebSocketTransport(
-            `ws://${this.options.host}:${this.options.port}/jsonrpc`
-        );
-        const client = new Client(new RequestManager([transport]));
-        this.client = client;
-    }
+    // async onDownloadPause() {
+    //     await this.client?.notify(
+    //          'aria2.onDownloadPause',
+    //          ["console.log('test)"],
+    //     );
+    // }
 }

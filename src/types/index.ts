@@ -1,7 +1,7 @@
 export interface Aria2nOptions {
-    ws?: boolean;
     host?: string;
     port?: number;
+    path?: string;
     secure?: boolean;
     secret?: string;
 }

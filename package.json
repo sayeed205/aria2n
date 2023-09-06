@@ -31,11 +31,13 @@
   },
   "devDependencies": {
     "@types/node": "18.15.11",
+    "@types/ws": "^8.5.5",
     "rimraf": "5.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@open-rpc/client-js": "1.8.1"
+    "isomorphic-ws": "5.0.0",
+    "ws": "8.13.0"
   }
 }
