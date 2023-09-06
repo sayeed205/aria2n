@@ -7,7 +7,14 @@
 import Client from './JSONRPC';
 // import { EventEmitter } from "events";
 
-import { Aria2Version, Aria2nOptions, Key, Status, downloads } from '../types';
+import {
+    AddUriOptions,
+    Aria2Version,
+    Aria2nOptions,
+    Key,
+    Status,
+    downloads,
+} from '../types';
 import { humanReadableBytes } from '../utils';
 
 export class Aria2n {
@@ -115,6 +122,13 @@ export class Aria2n {
 
     async removeDownload(gid: string) {
         await this.client?.request('aria2.remove', [gid]);
+    }
+
+    async addUri(uris: string[] | string, options: AddUriOptions = {}) {
+        if (typeof uris === 'string') {
+            uris = [uris];
+        }
+        await this.client?.request('aria2.addUri', [uris, options]);
     }
 
     // async onDownloadPause() {

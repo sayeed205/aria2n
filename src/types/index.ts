@@ -84,6 +84,10 @@ export type downloads = {
     path: string;
 };
 
+export type AddUriOptions = {
+    dir?: string;
+};
+
 /**
  * [
   {
