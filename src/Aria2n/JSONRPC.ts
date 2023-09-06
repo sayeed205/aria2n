@@ -3,10 +3,15 @@ import WebSocket from 'isomorphic-ws';
 class Client {
     private static requestId = 0;
     private ws: WebSocket | null = null;
+    private _messageHandlers: Array<Function> = [];
     constructor(private readonly url: string, private readonly secret: string) {
         this.url = url;
         this.secret = secret;
         this.ws = new WebSocket(this.url);
+
+        this.ws.addEventListener('message', () => {
+            this.onMessage.bind(this);
+        });
     }
 
     get sid(): number {
@@ -53,6 +58,18 @@ class Client {
                     error.name = 'ConnectionError';
                     return reject(error);
             }
+            ws.onmessage = event => {
+                let response = JSON.parse(event.data.toString());
+                if (response.id == request.id) resolve(response);
+            };
+            ws.close = () => {
+                this.ws = null;
+                reject(new Error('WebSocket is closed'));
+            };
+            ws.onerror = () => {
+                this.ws = null;
+                reject(new Error('Aria2 is unreachable'));
+            };
         });
     }
 
@@ -65,6 +82,18 @@ class Client {
             const data = JSON.parse(event.data.toString());
             cb(data);
         };
+    }
+
+    private onMessage(event: MessageEvent) {
+        try {
+            let data = JSON.parse(event.data);
+            data.source = this;
+            this._messageHandlers.forEach(handle => {
+                handle(data);
+            });
+        } catch (error) {
+            console.error('got an invalid message');
+        }
     }
 }
 
