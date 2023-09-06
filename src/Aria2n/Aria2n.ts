@@ -23,7 +23,7 @@ export class Aria2n {
     ) {
         this.options = options;
         this.client = new Client(
-            `http://${this.options.host}:${this.options.port}/jsonrpc`,
+            `ws://${this.options.host}:${this.options.port}/jsonrpc`,
             this.options.secret!
         );
     }
