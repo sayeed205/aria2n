@@ -97,6 +97,26 @@ export class Aria2n {
         return version;
     }
 
+    async pauseDownload(gid: string) {
+        await this.client?.request('aria2.pause', [gid]);
+    }
+
+    async pauseAllDownloads() {
+        await this.client?.request('aria2.pauseAll', []);
+    }
+
+    async resumeDownload(gid: string) {
+        await this.client?.request('aria2.unpause', [gid]);
+    }
+
+    async resumeAllDownloads() {
+        await this.client?.request('aria2.unpauseAll', []);
+    }
+
+    async removeDownload(gid: string) {
+        await this.client?.request('aria2.remove', [gid]);
+    }
+
     // async onDownloadPause() {
     //     await this.client?.notify(
     //          'aria2.onDownloadPause',
