@@ -1,6 +1,6 @@
 {
   "name": "aria2n",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Node package to interact with an aria2c daemon process with JSON-RPC.",
   "main": "bin/index.js",
   "scripts": {
