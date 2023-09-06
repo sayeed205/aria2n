@@ -125,7 +125,9 @@ export class Aria2n {
             ' ',
             ''
         );
-        const progress = (Number(completedLength) / Number(totalLength)) * 100;
+        const progress =
+            (Number(download.completedLength) / Number(download.totalLength)) *
+            100;
         let name = '';
         let isTorrent = false;
         if (download.bitTorrent) {
