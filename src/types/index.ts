@@ -81,6 +81,7 @@ export type downloads = {
     completedLength: string;
     totalLength: string;
     isTorrent: boolean;
+    path: string;
 };
 
 /**

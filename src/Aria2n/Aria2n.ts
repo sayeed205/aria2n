@@ -157,6 +157,8 @@ export class Aria2n {
             name = download.files![0].path.split('/').pop()!;
         }
 
+        const path = download.dir!;
+
         return {
             gid,
             status,
@@ -166,6 +168,7 @@ export class Aria2n {
             progress,
             name,
             isTorrent,
+            path,
         };
     }
 }
