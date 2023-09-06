@@ -25,9 +25,12 @@ export type Status = {
     totalLength: string;
     uploadLength: string;
     uploadSpeed: string;
+    bitTorrent: Bittorrent;
+    // todo)) add more fields regarding torrents
 };
 
 export type File = {
+    completedLength: string;
     index: string;
     length: string;
     path: string;
@@ -38,6 +41,12 @@ export type File = {
 export type Uri = {
     status: string;
     uri: string;
+};
+
+export type Bittorrent = {
+    announceList: string[][];
+    mode: string;
+    info: { name: string };
 };
 
 export type Key =
@@ -55,12 +64,22 @@ export type Key =
     | 'uploadLength'
     | 'uploadSpeed';
 
-export type onProgress = {
+// export type onProgress = {
+//     gid: string;
+//     completedLength: string;
+//     totalLength: string;
+//     downloadSpeed: string;
+//     status: string;
+// };
+
+export type downloads = {
     gid: string;
-    completedLength: string;
-    totalLength: string;
+    name: string;
+    progress: number;
     downloadSpeed: string;
     status: string;
+    completedLength: number;
+    totalLength: number;
 };
 
 /**

@@ -7,7 +7,8 @@
 import Client from './JSONRPC';
 // import { EventEmitter } from "events";
 
-import { Aria2Version, Aria2nOptions, Key, Status, onProgress } from '../types';
+import { Aria2Version, Aria2nOptions, Key, Status, downloads } from '../types';
+import { humanReadableBytes } from '../utils';
 
 export class Aria2n {
     private client: Client | null = null;
@@ -44,27 +45,10 @@ export class Aria2n {
         return downloads;
     }
 
-    async onProgress(cb: (downloads: onProgress[]) => void) {
+    async onProgress(cb: (downloads: downloads[]) => void) {
         while (true) {
-            const downloads = await this.getDownloads(
-                [],
-                [
-                    'completedLength',
-                    'gid',
-                    'totalLength',
-                    'status',
-                    'downloadSpeed',
-                ]
-            ).then(downloads =>
-                downloads.map(downloads => {
-                    return {
-                        gid: downloads.gid,
-                        completedLength: downloads.completedLength,
-                        totalLength: downloads.totalLength,
-                        status: downloads.status,
-                        downloadSpeed: downloads.downloadSpeed,
-                    } as unknown as onProgress;
-                })
+            const downloads = await this.getDownloads().then(downloads =>
+                downloads.map(downloads => this.formatDownload(downloads))
             );
 
             cb(downloads);
@@ -121,4 +105,34 @@ export class Aria2n {
     //          ["console.log('test)"],
     //     );
     // }
+
+    private formatDownload(download: Partial<Status>): downloads {
+        const gid = download.gid!;
+        const status = download.status!;
+        const downloadSpeed = humanReadableBytes(
+            Number(download.downloadSpeed),
+            2,
+            ' ',
+            '/s'
+        );
+        const completedLength = Number(download.completedLength);
+        const totalLength = Number(download.totalLength);
+        const progress = (Number(completedLength) / Number(totalLength)) * 100;
+        let name = '';
+        if (download.bitTorrent) {
+            name = download.bitTorrent.info.name;
+        } else {
+            name = download.files![0].path.split('/').pop()!;
+        }
+
+        return {
+            gid,
+            status,
+            downloadSpeed,
+            completedLength,
+            totalLength,
+            progress,
+            name,
+        };
+    }
 }
