@@ -47,9 +47,7 @@ export class Aria2n {
 
     async onProgress(cb: (downloads: downloads[]) => void) {
         while (true) {
-            const downloads = await this.getDownloads().then(downloads =>
-                downloads.map(downloads => this.formatDownload(downloads))
-            );
+            const downloads = await this.getDownloads();
 
             cb(downloads);
 
@@ -62,7 +60,7 @@ export class Aria2n {
             gid,
             keys,
         ])) as Partial<Status>;
-        return Status;
+        return this.formatDownload(Status);
     }
 
     async getActive(keys: Key[] = []) {
@@ -70,7 +68,7 @@ export class Aria2n {
             keys,
         ])) as Partial<Status>[];
 
-        return active;
+        return active.map(active => this.formatDownload(active));
     }
 
     async getWaiting(offset: number, limit: number, keys: Key[] = []) {
@@ -79,7 +77,7 @@ export class Aria2n {
             limit,
             keys,
         ])) as Partial<Status>[];
-        return waiting;
+        return waiting.map(waiting => this.formatDownload(waiting));
     }
 
     async getStopped(offset: number, limit: number, keys: Key[] = []) {
@@ -88,7 +86,7 @@ export class Aria2n {
             limit,
             keys,
         ])) as Partial<Status>[];
-        return stopped;
+        return stopped.map(stopped => this.formatDownload(stopped));
     }
 
     async getVersion() {
@@ -119,8 +117,10 @@ export class Aria2n {
         const totalLength = Number(download.totalLength);
         const progress = (Number(completedLength) / Number(totalLength)) * 100;
         let name = '';
+        let isTorrent = false;
         if (download.bitTorrent) {
             name = download.bitTorrent.info.name;
+            isTorrent = true;
         } else {
             name = download.files![0].path.split('/').pop()!;
         }
@@ -133,6 +133,7 @@ export class Aria2n {
             totalLength,
             progress,
             name,
+            isTorrent,
         };
     }
 }

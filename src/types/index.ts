@@ -80,6 +80,7 @@ export type downloads = {
     status: string;
     completedLength: number;
     totalLength: number;
+    isTorrent: boolean;
 };
 
 /**

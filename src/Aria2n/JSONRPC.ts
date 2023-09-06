@@ -35,7 +35,7 @@ class Client {
         return new Promise((resolve, reject) => {
             if (!ws) {
                 // return reject('No WebSocket connection');
-                // fall back to HTTP
+                // todo)) fall back to HTTP
                 return;
             }
             switch (ws.readyState) {
