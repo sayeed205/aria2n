@@ -1,4 +1,5 @@
 import WebSocket from 'isomorphic-ws';
+import { Status } from '../types';
 
 class Client {
     private static requestId = 0;
@@ -59,8 +60,12 @@ class Client {
                     return reject(error);
             }
             ws.onmessage = event => {
-                let response = JSON.parse(event.data.toString());
-                if (response.id == request.id) resolve(response);
+                let response = JSON.parse(event.data.toString()) as unknown as {
+                    id: number;
+                    result: Status[];
+                    jsonrpc: '2.0';
+                };
+                if (response.id == request.id) resolve(response.result);
             };
             ws.close = () => {
                 this.ws = null;
