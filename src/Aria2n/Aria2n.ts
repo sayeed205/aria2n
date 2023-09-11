@@ -43,6 +43,22 @@ export class Aria2n {
         }
     }
 
+    connect() {
+        try {
+            if (!this.status) {
+                this.client = new Client(
+                    `ws://${this.options.host}:${this.options.port}/jsonrpc`,
+                    this.options.secret!
+                );
+                this.status = true;
+            }
+        } catch (error) {
+            // console.log(error);
+            this.status = false;
+            throw new Error('Unable to connect to aria2 ' + error);
+        }
+    }
+
     async getDownloads(gids: string[] = [], keys: Key[] = []) {
         if (gids.length > 0) {
             const downloads = [];
