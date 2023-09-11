@@ -19,6 +19,7 @@ import { humanReadableBytes } from '../utils';
 
 export class Aria2n {
     private client: Client | null = null;
+    status: boolean = false;
 
     constructor(
         private readonly options: Aria2nOptions = {
@@ -30,10 +31,16 @@ export class Aria2n {
         }
     ) {
         this.options = options;
-        this.client = new Client(
-            `ws://${this.options.host}:${this.options.port}/jsonrpc`,
-            this.options.secret!
-        );
+        try {
+            this.client = new Client(
+                `ws://${this.options.host}:${this.options.port}/jsonrpc`,
+                this.options.secret!
+            );
+            this.status = true;
+        } catch (error) {
+            console.log(error);
+            this.status = false;
+        }
     }
 
     async getDownloads(gids: string[] = [], keys: Key[] = []) {
